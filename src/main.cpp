@@ -15,6 +15,11 @@
 #include <csignal>
 #include "socket_lib/SocketHandler.hpp"
 
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+
 using namespace SocketLib;
 
 static ModInfo modInfo; // Stores the ID and version of our mod, and is sent to the modloader upon startup
@@ -72,14 +77,12 @@ void connectEvent(Channel& c, bool connected){
     }
 }
 
-// Called later on in the game loading - a good time to install function hooks
-extern "C" void load() {
-    il2cpp_functions::Init();
+void test1(){
 
-    getLogger().info("Starting server at port 3306");
+    getLogger().info("Starting server at port 9007");
     SocketHandler& socketHandler = SocketHandler::getCommonSocketHandler();
 
-    ServerSocket* serverSocket = socketHandler.createServerSocket(3306);
+    ServerSocket* serverSocket = socketHandler.createServerSocket(9007);
     serverSocket->bindAndListen();
     getLogger().info("Started Server");
 
@@ -89,6 +92,41 @@ extern "C" void load() {
     serverSocket.registerListenCallback([this](Channel& client, const Message& message){
         listenOnEvents(client, message);
     });*/
+}
+
+/**
+ * blocking call to a socket server in node.js
+ * call this in load() and run node server.js in /src
+ * you also have to run `adb reverse tcp:9007 tcp:9007` instead of adb forward
+ */
+void test2(){
+ int sock = socket(AF_INET, SOCK_STREAM, 0);
+
+    struct sockaddr_in server_address;
+    server_address.sin_family = AF_INET;
+    server_address.sin_port = htons(9006); // port
+    server_address.sin_addr.s_addr = inet_addr("127.0.0.1"); //INADDR_ANY;
+
+    int status = connect(sock, (struct sockaddr * ) &server_address, sizeof(server_address));
+
+    if(status == -1){
+      getLogger().info("error connecting");
+    } else {
+      getLogger().info("connected successfully!");
+      char response[256];
+
+      // this is a blocking call
+      recv(sock,&response,sizeof(response),0);
+
+      getLogger().info("%s",response);
+    }
+}
+
+// Called later on in the game loading - a good time to install function hooks
+extern "C" void load() {
+    il2cpp_functions::Init();
+
+    test1();    
 
 
     getLogger().info("Installing hooks...");

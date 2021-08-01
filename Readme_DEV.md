@@ -1,26 +1,35 @@
 # development notes
-this is the first test, it doesnt work (01.08.2021)
+
+
+## test 1 - socket_lib
 
 i want to establish a socket connection from a node script to a mod running inside beatsaber
 
 - run `qpm restore`, `.\build.ps1`
-- run `adb forward tcp:3360 tcp:3360` to forward local port to port on quest
+- run `adb forward tcp:9007 tcp:9007` to forward local port to port on quest
+
 - run `.\copy.ps1` to start the game, adb logcat should output something like
     ```
-    QuestHook[questshell|v0.1.0]: Starting server at port 3306
+    QuestHook[questshell|v0.1.0]: Starting server at port 9007
     QuestHook[questshell|v0.1.0]: Started Server
     QuestHook[questshell|v0.1.0]: Installing hooks...
     QuestHook[questshell|v0.1.0]: Installing hook: MainMenuViewController_DidActivate to offset: 0x7b34b375f4
     QuestHook[questshell|v0.1.0]: Installed all hooks!
     ```
 - in /src run `node client.js` (you need nodejs [https://nodejs.dev/])
-- it connects and immediately disconnects 
+- it connects and prints
     ```
     Connected
-    Connection closed
+    Received: hi!
     ```
-- somewhere there is a mistake. the expected behaviour is that adb logcat outputs something like `QuestHook[questshell|v0.1.0]: connect event!`
-- i have no idea what im missing :)
+- adb logcat prints `QuestHook[questshell|v0.1.0]: connect event`
+
+## test 2 - by hand with sys/socket
+
+
+- call test2() in load
+- run `adb reverse tcp:9007 tcp:9007`
+- run `node server.js` in src
 
 # tino's ideas/plans:
 
@@ -33,6 +42,7 @@ i want to establish a socket connection from a node script to a mod running insi
 
 # tino's questions
 
+- in this test the module creates a socketserver but i think it would be better if the server was on the pc to allow multiple connections from multiple games (which always run the same code)
 - why is build.ps "compiling" the other libs? we dont need that i think, but i really dont understand these makefiles
 - could one do without qpm?
     - just put all needed header files inside this repo
