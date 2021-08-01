@@ -1,40 +1,12 @@
 # development notes
 
+- onMessage starts a duktape javascript interpreter, evaluates the message.
+- native c functions can be bound into the javascript context (see main.cpp:native_log)
 
-## test 1 - socket_lib
+# todo
 
-creates a socket server on the quest, client.js connects to it, receives and sends a message.
-
-
-- run `qpm restore`, `.\build.ps1`
-- run `adb forward tcp:9007 tcp:9007` to forward local port to port on quest
-
-- run `.\copy.ps1` to start the game, adb logcat should output something like
-    ```
-    QuestHook[questshell|v0.1.0]: Starting server at port 9007
-    QuestHook[questshell|v0.1.0]: Started Server
-    QuestHook[questshell|v0.1.0]: Installing hooks...
-    QuestHook[questshell|v0.1.0]: Installing hook: MainMenuViewController_DidActivate to offset: 0x7b34b375f4
-    QuestHook[questshell|v0.1.0]: Installed all hooks!
-    ```
-- in /src run `node client.js` (you need nodejs [https://nodejs.dev/])
-- it connects and prints
-    ```
-    Connected
-    Received: hi!
-    ```
-- adb logcat prints 
-    ```
-    QuestHook[questshell|v0.1.0]: connect event
-    QuestHook[questshell|v0.1.0]: Message received: Hello, server! Love, Client.
-    ```
-
-## test 2 - by hand with sys/socket
-
-
-- call test2() in load
-- run `adb reverse tcp:9007 tcp:9007`
-- run `node server.js` in src
+- keep the javascript context between messages
+- add a function that changes something in the game
 
 # tino's ideas/plans:
 
