@@ -77,6 +77,11 @@ void connectEvent(Channel& c, bool connected){
     }
 }
 
+void onMessage(Channel& client, const Message& message){
+  getLogger().info("Message received: %s",message.toString().c_str());
+}
+
+/* use socket_lib to start a socket server */
 void test1(){
 
     getLogger().info("Starting server at port 9007");
@@ -87,11 +92,8 @@ void test1(){
     getLogger().info("Started Server");
 
     serverSocket->registerConnectCallback(&connectEvent);
-
-    /*
-    serverSocket.registerListenCallback([this](Channel& client, const Message& message){
-        listenOnEvents(client, message);
-    });*/
+    serverSocket->registerListenCallback(&onMessage);
+   
 }
 
 /**

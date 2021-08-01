@@ -7,7 +7,7 @@ var net = require('net');
 var client = new net.Socket();
 client.connect(9007, 'localhost', function() {
 	console.log('Connected');
-	//client.write('Hello, server! Love, Client.');
+	client.write('Hello, server! Love, Client.');
 });
 
 client.on('data', function(data) {
