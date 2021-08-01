@@ -1,7 +1,8 @@
 # questshell
-run commands inside a quest mod
+run javascript inside a quest mod :)
 
 
 # credits / links
 
-https://github.com/Fernthedev/SocketLibLinux
+javascript engine: https://duktape.org/
+socket communication via: https://github.com/Fernthedev/SocketLibLinux

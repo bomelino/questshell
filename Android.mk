@@ -52,6 +52,7 @@ LOCAL_MODULE := questshell
 LOCAL_SRC_FILES += $(call rwildcard,src/,*.cpp)
 LOCAL_SRC_FILES += $(call rwildcard,extern/beatsaber-hook/src/inline-hook,*.cpp)
 LOCAL_SRC_FILES += $(call rwildcard,extern/beatsaber-hook/src/inline-hook,*.c)
+LOCAL_SRC_FILES += include/duktape.c
 LOCAL_SHARED_LIBRARIES += modloader
 LOCAL_SHARED_LIBRARIES += beatsaber-hook_2_2_4
 LOCAL_SHARED_LIBRARIES += codegen_0_12_5

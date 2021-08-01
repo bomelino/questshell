@@ -20,6 +20,8 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 
+#include "duktape.h"
+
 using namespace SocketLib;
 
 static ModInfo modInfo; // Stores the ID and version of our mod, and is sent to the modloader upon startup
@@ -63,12 +65,22 @@ extern "C" void setup(ModInfo& info) {
     getLogger().info("questshell Completed setup!");
 }
 
+
+/* example: function that can get called inside javascript
+log a number
+*/
+static duk_ret_t native_log(duk_context *ctx) {
+  int i = duk_to_number(ctx,0); // argument
+  getLogger().info("this got called inside javascript with the parameter: %i",i);
+  return 0;  /* no return values */
+}
+
+
 /*
   // int is client descriptor, true if connect, false disconnected
     using ConnectCallback = std::function<void(Channel&, bool)>;
     using ListenCallback = std::function<void(Channel&, const Message&)>;
 */
-
 void connectEvent(Channel& c, bool connected){
   getLogger().info("connect event!");
 
@@ -79,6 +91,18 @@ void connectEvent(Channel& c, bool connected){
 
 void onMessage(Channel& client, const Message& message){
   getLogger().info("Message received: %s",message.toString().c_str());
+
+  /* try to execute >:) */
+  duk_context *ctx = duk_create_heap_default();
+  // import native function into javascript context
+  duk_push_c_function(ctx, native_log, 1 /*nargs*/);
+  duk_put_global_string(ctx, "log");
+
+  // evaluate message string
+  duk_eval_string(ctx, message.toString().c_str());
+  int result =  (int) duk_get_int(ctx, -1);
+  getLogger().info("eval result:%i",result);
+
 }
 
 /* use socket_lib to start a socket server */
@@ -130,6 +154,12 @@ extern "C" void load() {
 
     test1();    
 
+    /* try javascript interpreter */
+    duk_context *ctx = duk_create_heap_default();
+    duk_eval_string(ctx, "1+2");
+    int result =  (int) duk_get_int(ctx, -1);
+    getLogger().info("js result:%i",result);
+    
 
     getLogger().info("Installing hooks...");
     // Install our hooks (none defined yet)
